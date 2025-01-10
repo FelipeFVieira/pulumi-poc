@@ -1,17 +1,24 @@
 name: Active-Pulumi-Website-on-S3-Python
 
 on: 
-  repository_dispatch:
-    types: 
-      - pulumi_website_on_s3_python
+  workflow_dispatch:
+    inputs:
+      bucket-name:
+        description: 'Nome do bucket'
+        required: true
+        default: 'pulumi'
+      aws-region:
+        description: 'Região AWS'
+        required: true
+        default: 'us-east-1'
 
 jobs: 
   Pulumi-Up:
     runs-on: ubuntu-latest
-
+    
     env:
-      BUCKET_NAME: ${{ github.event.client_payload.bucket-name }}
-      AWS_REGION: ${{ github.event.client_payload.aws-region }} 
+      BUCKET_NAME: ${{ github.event.inputs.bucket-name }}
+      AWS_REGION:  ${{ github.event.inputs.aws-region }} 
       
     steps:
       # 1. Repository Checkout
@@ -42,7 +49,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: 
+          aws-region: ${env.AWS_REGION}
 
       # 6. Executar o Pulumi
       - name: Pulumi up
