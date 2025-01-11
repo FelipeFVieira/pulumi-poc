@@ -21,6 +21,10 @@ jobs:
       AWS_REGION:  ${{ github.event.inputs.aws-region }} 
       
     steps:
+    
+      - name: Debug Environment Variables
+        run: env
+
       # 1. Repository Checkout
       - name: Checkout repository
         uses: actions/checkout@v3
