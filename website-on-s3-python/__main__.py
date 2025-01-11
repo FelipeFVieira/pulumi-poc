@@ -5,7 +5,7 @@ import pulumi_aws as aws
 
 # Criação de um bucket S3 com configuração de site estático
 
-bucket_name = os.getenv(BUCKET_NAME)
+bucket_name = os.getenv("BUCKET_NAME")
 bucket = aws.s3.Bucket(bucket_name,
     bucket=bucket_name,
 )
