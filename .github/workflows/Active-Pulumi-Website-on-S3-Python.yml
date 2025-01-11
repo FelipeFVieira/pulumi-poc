@@ -57,7 +57,7 @@ jobs:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         run: | 
           cd ./website-on-s3-python
-          pulumi stack select Stacks/website-on-s3/website-on-s3
+          pulumi stack select FelipeFVieira/website-on-s3/website-on-s3
           pulumi up --yes
     
   
