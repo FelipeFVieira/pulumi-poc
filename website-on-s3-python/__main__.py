@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import pulumi
 import pulumi_aws as aws
@@ -6,15 +7,13 @@ import pulumi_aws as aws
 # Criação de um bucket S3 com configuração de site estático
 
 bucket_name = os.getenv("BUCKET_NAME")
+
 bucket = aws.s3.Bucket(bucket_name,
     bucket=bucket_name,
+    website={
+        'index_document': 'index.html',
+    },
 )
-
-website = aws.s3.BucketWebsiteConfigurationV2("website",
-    bucket=bucket.id,
-    index_document={
-        "suffix": "index.html",
-})
 
 ownership_controls = aws.s3.BucketOwnershipControls(
     'ownership-controls',
@@ -25,7 +24,9 @@ ownership_controls = aws.s3.BucketOwnershipControls(
 )
 
 public_access_block = aws.s3.BucketPublicAccessBlock(
-    'public-access-block', bucket=bucket.id, block_public_acls=False
+    'public-access-block', 
+    bucket=bucket.id, 
+    block_public_acls=False
 )
 
 # Definindo uma política de bucket para permitir acesso público
@@ -42,16 +43,17 @@ bucket_policy = aws.s3.BucketPolicy('bucket-policy',
             }
         ]
     }),
+    opts=pulumi.ResourceOptions(depends_on=[public_access_block])
    
 )
 
 bucket_object = aws.s3.BucketObject(
     'index.html',
     bucket=bucket.id,
-    source=pulumi.FileAsset('index.html'),
+    source=pulumi.FileAsset('./index.html'),
     content_type='text/html',
     acl='public-read',
-    opts=pulumi.ResourceOptions(depends_on=[public_access_block, ownership_controls, website]),
+    opts=pulumi.ResourceOptions(depends_on=[public_access_block, ownership_controls]),
 )
 
 pulumi.export('bucket_name', bucket.id)
